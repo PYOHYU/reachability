@@ -1,0 +1,14 @@
+float64 eef_x
+float64 eef_y
+float64 eef_z
+
+float64 eef_roll
+float64 eef_pitch
+float64 eef_yaw
+
+float64 Cr
+int8 num_sol
+
+---
+geometry_msgs/Pose base_pose
+float64[] joint_arr
