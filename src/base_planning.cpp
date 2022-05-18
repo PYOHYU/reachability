@@ -3,14 +3,12 @@
 namespace base_planner
 {
 
-    void BasePlanner::BasePlan(double x_goal, double y_goal, double th_goal, std::vector < double >& xyth, ros::Time& current_time, ros::Time& last_time, ros::Publisher& odom_pub)
+    void BasePlanner::BasePlan(double x_goal, double y_goal, double th_goal, double& x, double& y, double& th, ros::Time& current_time, ros::Time& last_time, ros::Publisher& odom_pub, bool& base_check)
     {
+        if (base_check == true)
+            return;
 
         tf::TransformBroadcaster odom_broadcaster;
-
-        double x = xyth[0];
-        double y = xyth[1];
-        double th = xyth[2];
 
         double vx = 0.5;
         double vy = 0.0;
@@ -21,13 +19,13 @@ namespace base_planner
         double dt = (current_time - last_time).toSec();
         
         double K_lin = 0.5;
-        double distance = abs(sqrt(pow((x-x_goal), 2) + pow((y-y_goal), 2)));
+        double distance = std::fabs(sqrt(pow((x-x_goal), 2) + pow((y-y_goal), 2)));
         double linear_speed = distance * K_lin;
 
         if(linear_speed > vx)
             linear_speed = vx;
 
-        double K_ang = 2.0;
+        double K_ang = 0.5;
         double angle_goal = atan2(y_goal-y, x_goal-x);
         double angular_speed;
 
@@ -39,33 +37,54 @@ namespace base_planner
 
         if (distance < 0.01)
         {   
-            if (abs(th_goal-th) < 0.01)
+            double th_diff = th_goal - th;
+                
+            if (th_diff < -M_PI)
+                th_diff += 2*M_PI;
+            if (th_diff > M_PI)
+                th_diff -= 2*M_PI;
+
+            if (std::fabs(th_diff) < 0.01)
             {
                 ROS_INFO_STREAM("Base Planning End.");
+                base_check = true;
                 return;
             }
             else
             {
-                //only rotation 
-                angular_speed = (th_goal - th) * K_ang;
+                //Rotation2       
+                angular_speed = th_diff * K_ang;
 
                 delta_th = angular_speed * dt;
 
                 th += delta_th;
-                ROS_INFO_STREAM("Rotation.");
+
             }
         }
         else
         {
-            //Do
-            angular_speed = (angle_goal - th) * K_ang;
-            delta_th = angular_speed * dt;
-
-            x += delta_x;
-            y += delta_y;           
-            th += delta_th;
-
-            ROS_INFO_STREAM("Go to Waypoint.");
+            
+            double th_diff = angle_goal - th;
+                
+            if (th_diff < -M_PI)
+                th_diff += 2*M_PI;
+            if (th_diff > M_PI)
+                th_diff -= 2*M_PI;
+                
+            if (std::fabs(th_diff) >= 0.01)
+            {   
+                //Rotation1
+                angular_speed = th_diff * K_ang;
+                delta_th = angular_speed * dt;
+                th += delta_th;
+            }
+            else
+            {
+                //Go Forward
+                x += delta_x;
+                y += delta_y;   
+            }
+           
         }
 
         //first, we'll publish the transform over tf
@@ -102,14 +121,7 @@ namespace base_planner
         //publish the message
         odom_pub.publish(odom);
 
-        ROS_INFO_STREAM("\n Position:    \n --- \n" << x << '\n' << y);
-        ROS_INFO_STREAM("\n Angle(rad):    \n --- \n" << th);
-
         last_time = current_time;
-
-        xyth[0] = x;
-        xyth[1] = y;
-        xyth[2] = th;
 
         return;
     }

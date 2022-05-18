@@ -13,7 +13,8 @@ namespace workspace_spreader
         {
             for (double y = - diameter; y <= diameter; y += dy)
             {
-                for (double z = 0; z <= 2 * diameter; z += dz)
+                //for (double z = 0; z <= 2 * diameter; z += dz)
+                for (double z = 0.6; z <= 1.2; z += dz)
                 {
                     std::vector< double > vox{x, y, z};
 

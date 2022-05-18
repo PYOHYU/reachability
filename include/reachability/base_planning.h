@@ -15,7 +15,7 @@ public:
     BasePlanner(){}
     ~BasePlanner(){}
     
-    void BasePlan(double x_goal, double y_goal, double th_goal, std::vector < double >& xyth, ros::Time& current_time, ros::Time& last_time, ros::Publisher& odom_pub);
+    void BasePlan(double x_goal, double y_goal, double th_goal, double& x, double& y, double& th, ros::Time& current_time, ros::Time& last_time, ros::Publisher& odom_pub, bool& base_check);
 
 };
 }

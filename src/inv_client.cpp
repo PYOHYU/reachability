@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
     if(client.call(srv))
     {
-        ROS_INFO("send srv : %f, %f, %f, %f, %f, %f, %f, %f",
+        ROS_INFO("send srv : %f, %f, %f, %f, %f, %f, %f, %d",
         srv.request.eef_x,
         srv.request.eef_y,
         srv.request.eef_z,

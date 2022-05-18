@@ -12,8 +12,10 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_visual_tools
   message_generation
 )
+
 find_package(orocos_kdl REQUIRED)
 find_package(kdl_conversions REQUIRED)
+find_package(pr2_ikfast_right_arm_plugin REQUIRED)
 
 add_service_files(
   FILES
@@ -27,12 +29,12 @@ generate_messages(
 )
 
 catkin_package(
-
   INCLUDE_DIRS
     ${THIS_PACKAGE_INCLUDE_DIRS}
   LIBRARIES
     workspace_spreader
     roscpp
+    pr2_right_arm_moveit_ikfast_plugin
   CATKIN_DEPENDS
 		moveit_ros_planning_interface
     visualization_msgs
@@ -50,8 +52,14 @@ include_directories(SYSTEM
 	${catkin_INCLUDE_DIRS}
 )
 include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(${pr2_ikfast_right_arm_plugin_INCLUDE_DIRS})
 
-
+install(
+  FILES
+  pr2_right_arm_moveit_ikfast_plugin_description.xml
+  DESTINATION
+  ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 add_library(workspace_spreader  src/workspace_spreader.cpp)
 target_link_libraries(workspace_spreader  ${catkin_LIBRARIES} )
@@ -70,7 +78,7 @@ target_link_libraries(recorder_ikfast
   ${catkin_LIBRARIES}
 )
 add_dependencies(recorder_ikfast ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(recorder_ikfast workspace_spreader ${catkin_LIBRARIES})
+target_link_libraries(recorder_ikfast workspace_spreader pr2_right_arm_moveit_ikfast_plugin ${catkin_LIBRARIES})
 
 
 add_executable(ik src/ik.cpp)
@@ -97,6 +105,10 @@ target_link_libraries(inverse_map_build_2  ${catkin_LIBRARIES} )
 add_dependencies(inverse_map_build_2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
+add_executable(inv_server_copy src/inv_server_copy.cpp)
+target_link_libraries(inv_server_copy base_planning
+  ${catkin_LIBRARIES})
+add_dependencies(inv_server_copy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_executable(inv_server src/inv_server.cpp)
 target_link_libraries(inv_server base_planning
   ${catkin_LIBRARIES})
@@ -109,3 +121,12 @@ target_link_libraries(inv_client
   add_executable(base_sub src/base_sub.cpp)
 target_link_libraries(base_sub
   ${catkin_LIBRARIES})
+
+
+
+add_executable(forward src/forward.cpp)
+target_link_libraries(forward
+  ${catkin_LIBRARIES}
+)
+add_dependencies(forward ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+

@@ -6,6 +6,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <reachability/workspace_spreader.h>
+#include <ikfast.h>
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
@@ -108,14 +109,16 @@ int main(int argc, char** argv)
 
         std::vector<double> target_joints(joint_model_group->getVariableCount());
 
-// IK using Trac-IK
-        int rc;
+// IK
 
         std::vector< geometry_msgs::Pose > pose_col_filter;
         std::vector< std::pair< geometry_msgs::Pose, double > > solution;
         std::vector< std::vector<double> > joint_solution;
         const unsigned int attempts = 10;
         const double timeout = 0.0;
+
+        //ikfast::
+
 
         for (int i = 0; i < pose_col.size(); i++)
         {   
