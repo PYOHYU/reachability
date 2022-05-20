@@ -61,7 +61,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
 
     std::random_device rng;
     std::uniform_real_distribution<double> rand_xy(-10, 10);
-    std::uniform_real_distribution<double> rand_z(0.5, 1.3);
+    std::uniform_real_distribution<double> rand_z(0.6, 1.2);
     std::uniform_real_distribution<double> rand_ry(-180, 180);
     std::uniform_real_distribution<double> rand_p(-90, 90);
 
@@ -174,9 +174,12 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
         // Transform to get base pose
         std::vector< Data > data;
         int datasize = 0;
+        int NumSol = req.num_sol;
 
-        for(int i = 0; i < sol_size; i++)
+        for (int i = 0; i < sol_size; i++)
         {   
+            if (datasize > NumSol) { break; }
+
             //Initial base angle yaw
             double theta = (eef_data[i].second[2]) * 180 / M_PI;  //deg
 
@@ -190,6 +193,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
 
             for(double j = min_angle; j <= max_angle; j += interval)
             {
+                
                 double Cb = j - theta;
                 double c = std::cos(Cb * M_PI/180); //rad
                 double s = std::sin(Cb * M_PI/180);
@@ -198,18 +202,16 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
 
                 Data d = {mu_data[i], (j * M_PI/180), nbx_, nby_,  jnt_data[i]};
 
-                data.push_back(d);
-                datasize++;
+                if (datasize > NumSol) { break; }
+                else
+                {
+                    data.push_back(d);
+                    datasize++;
+                }
             }
-
         }
 
-        std::sort(std::begin(data), std::end(data), [](Data& a, Data& b)
-        {
-            return a.mu > b.mu;
-        });
-
-        int NumSol = req.num_sol;
+        NumSol = std::min(NumSol, datasize);
 
         std::vector< std::vector<double> > Solxy;
         std::vector< double >SolYaw;
@@ -217,7 +219,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
         std::vector< geometry_msgs::Pose > SolPos;
 
         int idx = 0;
-        while(Solxy.size() < std::min(NumSol, datasize))
+        while(Solxy.size() < NumSol)
         {
             // These are pose of base_footprint
             std::vector<double> solutions(2);

@@ -11,7 +11,8 @@ namespace workspace_spreader
 
         for (double x = 0; x <= diameter; x += dx)
         {
-            for (double y = - diameter; y <= diameter; y += dy)
+            //for (double y = - diameter; y <= diameter; y += dy)
+            for (double y = - diameter; y <= 0; y += dy)
             {
                 //for (double z = 0; z <= 2 * diameter; z += dz)
                 for (double z = 0.6; z <= 1.2; z += dz)

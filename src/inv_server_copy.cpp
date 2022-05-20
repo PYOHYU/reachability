@@ -58,7 +58,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
     ROS_INFO_STREAM("Load inverse reachability datafile");
 
     std::ifstream loadFile(ros::package::getPath("reachability") + "/src/" + 
-    "right_arm_inverse_reachability2.csv");
+    "right_arm_inverse_reachability3.csv");
 
     if (loadFile.fail())
     {
