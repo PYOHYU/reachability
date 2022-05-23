@@ -74,10 +74,15 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
         double eef_rand_p = rand_p(rng);
         double eef_rand_yaw = rand_ry(rng);
 
+        double interval = 5;   // angle interval, deg
+        int NumSol = req.num_sol;
+        int solperpos = (int)(req.Cr * 2 / interval) + 1;   //sols per one pose.
+        int getdata = (int)(NumSol / solperpos) + 1;
+
         ros::Time startit = ros::Time::now();
 
         std::ifstream loadFile(ros::package::getPath("reachability") + "/src/" + 
-        "right_arm_inverse_reachability3.csv");
+        "right_arm_inverse_reachability2.csv");
 
         if (loadFile.fail())
         {
@@ -103,7 +108,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
 
         int k = 0;
 
-        while(getline(loadFile, line))
+        while(getline(loadFile, line) && sol_size < getdata)
         {
             std::string tempString;
             std::stringstream inputString(line);
@@ -174,11 +179,11 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
         // Transform to get base pose
         std::vector< Data > data;
         int datasize = 0;
-        int NumSol = req.num_sol;
+        
 
         for (int i = 0; i < sol_size; i++)
         {   
-            if (datasize > NumSol) { break; }
+            if (datasize >= NumSol) { break; }
 
             //Initial base angle yaw
             double theta = (eef_data[i].second[2]) * 180 / M_PI;  //deg
@@ -186,7 +191,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
             double bx_ = base_data[i][0];
             double by_ = base_data[i][1];
 
-            double interval = 5;   // angle, deg
+            
         
             double max_angle = eef_rand_yaw + req.Cr;    //deg
             double min_angle = eef_rand_yaw - req.Cr;
@@ -202,7 +207,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
 
                 Data d = {mu_data[i], (j * M_PI/180), nbx_, nby_,  jnt_data[i]};
 
-                if (datasize > NumSol) { break; }
+                if (datasize >= NumSol) { break; }
                 else
                 {
                     data.push_back(d);
