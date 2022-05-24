@@ -97,12 +97,6 @@ target_link_libraries(inverse_map_build
 target_link_libraries(inverse_map_build  ${catkin_LIBRARIES} )
 add_dependencies(inverse_map_build ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(inverse_map_build_2 src/inverse_map_build_2.cpp)
-target_link_libraries(inverse_map_build_2
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(inverse_map_build_2  ${catkin_LIBRARIES} )
-add_dependencies(inverse_map_build_2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 add_executable(inv_server_copy src/inv_server_copy.cpp)
@@ -124,9 +118,9 @@ target_link_libraries(base_sub
 
 
 
-add_executable(forward src/forward.cpp)
-target_link_libraries(forward
+add_executable(reading_file src/reading_file.cpp)
+target_link_libraries(reading_file
   ${catkin_LIBRARIES}
 )
-add_dependencies(forward ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(reading_file ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
