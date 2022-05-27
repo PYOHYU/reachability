@@ -103,10 +103,21 @@ add_executable(inv_server_copy src/inv_server_copy.cpp)
 target_link_libraries(inv_server_copy base_planning
   ${catkin_LIBRARIES})
 add_dependencies(inv_server_copy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 add_executable(inv_server src/inv_server.cpp)
 target_link_libraries(inv_server base_planning
   ${catkin_LIBRARIES})
 add_dependencies(inv_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(inv_server_kdtree src/inv_server_kdtree.cpp)
+target_link_libraries(inv_server_kdtree base_planning
+  ${catkin_LIBRARIES})
+add_dependencies(inv_server_kdtree ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(inv_server_kdtree_300 src/inv_server_kdtree_300.cpp)
+target_link_libraries(inv_server_kdtree_300 base_planning
+  ${catkin_LIBRARIES})
+add_dependencies(inv_server_kdtree_300 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(inv_client src/inv_client.cpp)
 target_link_libraries(inv_client

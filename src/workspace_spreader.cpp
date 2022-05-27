@@ -14,8 +14,8 @@ namespace workspace_spreader
             //for (double y = - diameter; y <= diameter; y += dy)
             for (double y = - diameter; y <= 0; y += dy)
             {
-                //for (double z = 0; z <= 2 * diameter; z += dz)
-                for (double z = 0.6; z <= 1.2; z += dz)
+                for (double z = 0; z <= 2 * diameter; z += dz)
+                //for (double z = 0.6; z <= 1.2; z += dz)
                 {
                     std::vector< double > vox{x, y, z};
 
@@ -29,7 +29,7 @@ namespace workspace_spreader
     // Make Sphere Poses
     void WorkspaceSpreader::SpherePoses(std::vector< tf2::Quaternion >& quat)
     {
-        const double DELTA = M_PI / 6;
+        const double DELTA = M_PI / 12;
 
         for (double phi = M_PI / 2; phi <= M_PI * 3 / 2; phi += DELTA) // elevation
         //for (double phi = M_PI; phi <= M_PI; phi += DELTA)

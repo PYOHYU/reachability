@@ -235,7 +235,7 @@ int main(int argc, char** argv)
         ROS_INFO_STREAM("Make reachability datafile");
 
         std::ofstream writeFile(ros::package::getPath("reachability") + "/src/" +
-          "right_arm_reachability4.csv");
+          "right_arm_reachability6.csv");
 
         writeFile << base_frame << "," << eef_frame << "," << JntNum << std::endl;
 
