@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     ROS_INFO_STREAM("Load reachability datafile");
 
     std::ifstream loadFile(ros::package::getPath("reachability") + "/src/" + 
-    "right_arm_reachability4.csv");
+    "right_arm_reachability6.csv");
 
     if (loadFile.fail())
     {
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     }
 
     std::ofstream writeFile(ros::package::getPath("reachability") + "/src/" +
-        "right_arm_inverse_reachability4_.csv");
+        "right_arm_inverse_reachability6_.csv");
 
 
     std::string line = "";

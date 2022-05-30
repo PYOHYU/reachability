@@ -28,6 +28,7 @@ int main(int argc, char** argv)
     spinner.start();
 
     static const std::string PLANNING_GROUP = "right_arm";
+
     moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
 // Visualization
     std::string base_frame = "torso_lift_link";
     std::string eef_frame = "r_wrist_roll_link";
+
     moveit_visual_tools::MoveItVisualTools visual_tools(base_frame);
     visual_tools.loadRemoteControl();
 
@@ -54,7 +56,7 @@ int main(int argc, char** argv)
     {
         ROS_INFO_STREAM("Make Worspace Voxels");
         workspace_spreader::WorkspaceSpreader ws;
-        double diameter = 1.2;
+        double diameter = 1.5;
         double resolution = 0.05;
 
 //center of voxels
@@ -114,15 +116,15 @@ int main(int argc, char** argv)
         std::vector< geometry_msgs::Pose > pose_col_filter;
         std::vector< std::pair< geometry_msgs::Pose, double > > solution;
         std::vector< std::vector<double> > joint_solution;
-        const unsigned int attempts = 10;
+        const unsigned int attempts = 0;
         const double timeout = 0.0;
 
         for (int i = 0; i < pose_col.size(); i++)
         {   
             double mu, mu2;
             
+            //bool found_ik = kinematic_state->setFromIK(joint_model_group, pose_col[i], eef_frame, attempts, timeout);
             bool found_ik = kinematic_state->setFromIK(joint_model_group, pose_col[i], eef_frame, attempts, timeout);
-            
 
             if (found_ik)
             {
@@ -171,7 +173,7 @@ int main(int argc, char** argv)
                 mu2 = 0;
             }
                  
-            if (i % 2000 == 0)
+            if (i % 20000 == 0)
             {
                 ROS_INFO_STREAM("Calculated " << i + 1);
                 ROS_INFO_STREAM("No of sol: " << solution.size());
@@ -234,8 +236,7 @@ int main(int argc, char** argv)
 */
         ROS_INFO_STREAM("Make reachability datafile");
 
-        std::ofstream writeFile(ros::package::getPath("reachability") + "/src/" +
-          "right_arm_reachability6.csv");
+        std::ofstream writeFile(ros::package::getPath("reachability") + "/src/" + "right_arm_reachability6.csv");
 
         writeFile << base_frame << "," << eef_frame << "," << JntNum << std::endl;
 

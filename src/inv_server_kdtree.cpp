@@ -9,7 +9,6 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
 #include <cmath>
-#include <random>
 #include <numeric>
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,6 +69,39 @@ int howManyNodes(struct node *_head)
 	}
 }
 
+void doBubbleSort(struct node **_array, int _byX, int _size)
+{
+	int i = 0;
+	int j = 0;
+
+	for (j = 0; j < _size; j++)
+	{
+		for (i = 0; i < _size - 1 - j; i++) 
+		{
+			if (_byX == 1)  // compare about z
+			{
+				if (_array[i]->z > _array[i + 1]->z)
+				{
+					// swap
+					struct node *temp = _array[i];
+					_array[i] = _array[i + 1];
+					_array[i + 1] = temp;
+				}
+			}
+			else            // compare about p
+			{
+				if (_array[i]->p > _array[i + 1]->p)
+				{
+					// swap
+					struct node *temp = _array[i];
+					_array[i] = _array[i + 1];
+					_array[i + 1] = temp;
+				}
+			}
+		}
+	}
+}
+
 struct node *rebuildSLL(struct node **_array, int from, int to)
 {
 	if (from > to)
@@ -116,6 +148,7 @@ struct kdtree_node *build_kdtree(struct node *sll,
 	}
 	
     int axis = _depth % _dimension;
+    doBubbleSort(nodeAddrArray, !axis, numSLLNodes);
 	int _median = numSLLNodes / 2;
 
 	struct kdtree_node *cur = (struct kdtree_node *)malloc(sizeof(struct kdtree_node));
@@ -244,12 +277,13 @@ struct kdtree_node *RealNearestNeighbor(struct kdtree_node *_root,
 		return _minDiffNode; 
 	}
 
-	if (_root->data->z == _z && _root->data->p == _p)
+    if (_root->data->z == _z && _root->data->p == _p)
 	{
 		return _root;
 	}
- 
+
 	double dist = (_root->data->z - _z)*(_root->data->z - _z) + (_root->data->p - _p)*(_root->data->p - _p);
+
 	if (dist < _minDiff)
 	{
 		_minDiff = dist;
@@ -259,9 +293,9 @@ struct kdtree_node *RealNearestNeighbor(struct kdtree_node *_root,
 	struct kdtree_node *wayTo = whichWayToGo(_root, _z, _p, axis%dim);
 	struct kdtree_node *NN =
 		RealNearestNeighbor(wayTo, _z, _p, _minDiff, _minDiffNode, axis + 1, dim);
-															
-	double dist_to_NN = (NN->data->z - _z)*(NN->data->z - _z) + (NN->data->p - _p)*(NN->data->p - _p);
-	
+
+    double dist_to_NN = (NN->data->z - _z)*(NN->data->z - _z) + (NN->data->p - _p)*(NN->data->p - _p);
+
     if (axis%dim == 0)
 	{
 		if (dist_to_NN > (_z - _root->data->z)*(_z - _root->data->z))
@@ -330,15 +364,6 @@ void MakeMarker(visualization_msgs::Marker& marker, geometry_msgs::Pose& arrow_p
 
 bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvReach::Response& res)
 {
-
-    std::vector<double> TimeDuration;
-
-    std::random_device rng;
-    std::uniform_real_distribution<double> rand_xy(-10, 10);
-    std::uniform_real_distribution<double> rand_z(0.6, 1.2);
-    std::uniform_real_distribution<double> rand_ry(-180, 180);
-    std::uniform_real_distribution<double> rand_p(-90, 90);
-
     std::vector< std::vector<double> > base_data;
     std::vector< std::pair< std::vector<double>, std::vector<double> > > eef_data;
     std::vector< double > mu_data;
@@ -472,7 +497,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
     arrow_eef.position.y = req.eef_y;
     arrow_eef.position.z = req.eef_z;
     tf::Quaternion q_eef;
-    q_eef.setRPY(req.eef_roll*M_PI/180, req.eef_pitch*M_PI/180, req.eef_yaw*M_PI/180);
+    q_eef.setRPY(req.eef_roll, req.eef_pitch, req.eef_yaw);
     arrow_eef.orientation.x = q_eef[0];
     arrow_eef.orientation.y = q_eef[1];
     arrow_eef.orientation.z = q_eef[2];
@@ -587,7 +612,7 @@ int main(int argc, char **argv)
     ROS_INFO_STREAM("IRM data open");
     ros::Time openstart = ros::Time::now();
     std::ifstream loadFile(ros::package::getPath("reachability") + "/src/" + 
-    "right_arm_inverse_reachability2_.csv");
+    "right_arm_inverse_reachability6_.csv");
 
     if (loadFile.fail())
     {
@@ -682,7 +707,7 @@ int main(int argc, char **argv)
                 sub_data.push_back(etc);
                 sub_data_list.push_back(sub_data);
             }
-               
+  
         }
         line = "";
     }
@@ -691,6 +716,9 @@ int main(int argc, char **argv)
 
     double dif_kd = ros::Duration( ros::Time::now() - openstart).toNSec() / 1000;
     ROS_INFO_STREAM("k-d tree made : " << dif_kd << " microsec");
+
+    
+    
 
     ros::AsyncSpinner spinner(4);
     spinner.start();

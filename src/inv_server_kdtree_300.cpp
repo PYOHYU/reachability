@@ -70,6 +70,39 @@ int howManyNodes(struct node *_head)
 	}
 }
 
+void doBubbleSort(struct node **_array, int _byX, int _size)
+{
+	int i = 0;
+	int j = 0;
+
+	for (j = 0; j < _size; j++)
+	{
+		for (i = 0; i < _size - 1 - j; i++) 
+		{
+			if (_byX == 1)  // compare about z
+			{
+				if (_array[i]->z > _array[i + 1]->z)
+				{
+					// swap
+					struct node *temp = _array[i];
+					_array[i] = _array[i + 1];
+					_array[i + 1] = temp;
+				}
+			}
+			else            // compare about p
+			{
+				if (_array[i]->p > _array[i + 1]->p)
+				{
+					// swap
+					struct node *temp = _array[i];
+					_array[i] = _array[i + 1];
+					_array[i + 1] = temp;
+				}
+			}
+		}
+	}
+}
+
 struct node *rebuildSLL(struct node **_array, int from, int to)
 {
 	if (from > to)
@@ -116,6 +149,7 @@ struct kdtree_node *build_kdtree(struct node *sll,
 	}
 	
     int axis = _depth % _dimension;
+    doBubbleSort(nodeAddrArray, !axis, numSLLNodes);
 	int _median = numSLLNodes / 2;
 
 	struct kdtree_node *cur = (struct kdtree_node *)malloc(sizeof(struct kdtree_node));
@@ -494,7 +528,7 @@ int main(int argc, char **argv)
     ros::Time openstart = ros::Time::now();
 
     std::ifstream loadFile(ros::package::getPath("reachability") + "/src/" + 
-    "right_arm_inverse_reachability2_.csv");
+    "right_arm_inverse_reachability6_.csv");
 
     if (loadFile.fail())
     {
