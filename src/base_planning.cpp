@@ -54,6 +54,8 @@ namespace base_planner
             {
                 //Rotation2       
                 angular_speed = th_diff * K_ang;
+                angular_speed = std::fabs(angular_speed) > vth ?
+                    angular_speed / std::fabs(angular_speed) * vth : angular_speed;
 
                 delta_th = angular_speed * dt;
 
@@ -75,6 +77,8 @@ namespace base_planner
             {   
                 //Rotation1
                 angular_speed = th_diff * K_ang;
+                angular_speed = std::fabs(angular_speed) > vth ?
+                    angular_speed / std::fabs(angular_speed) * vth : angular_speed;
                 delta_th = angular_speed * dt;
                 th += delta_th;
             }
@@ -91,7 +95,8 @@ namespace base_planner
         geometry_msgs::TransformStamped odom_trans;
         odom_trans.header.stamp = current_time;
         odom_trans.header.frame_id = "odom_combined";
-        odom_trans.child_frame_id = "base_footprint";
+        //odom_trans.child_frame_id = "base_footprint";
+        odom_trans.child_frame_id = "base_link";
 
         odom_trans.transform.translation.x = x;
         odom_trans.transform.translation.y = y;
@@ -113,7 +118,8 @@ namespace base_planner
         odom.pose.pose.orientation = odom_quat;
 
         //set the velocity
-        odom.child_frame_id = "base_footprint";
+        //odom.child_frame_id = "base_footprint";
+        odom.child_frame_id = "base_link";
         odom.twist.twist.linear.x = linear_speed;
         odom.twist.twist.linear.y = 0;
         odom.twist.twist.angular.z = angular_speed;

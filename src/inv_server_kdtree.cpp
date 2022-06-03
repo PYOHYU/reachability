@@ -522,7 +522,9 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
     ros::NodeHandle nh_eef;
     //ros::AsyncSpinner spinner(4);
     //spinner.start();
-    static const std::string PLANNING_GROUP = "right_arm";
+    
+    //static const std::string PLANNING_GROUP = "right_arm";
+    static const std::string PLANNING_GROUP = "arm_right";
     moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
@@ -567,7 +569,7 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
 
             const unsigned int attempts = 10;
             const double timeout = 0.0;
-            bool found_ik = kinematic_state->setFromIK(joint_model_group, arrow_eef, attempts, timeout);
+            //bool found_ik = kinematic_state->setFromIK(joint_model_group, arrow_eef, attempts, timeout);
 
             move_group.setJointValueTarget(SolJnt[0]);            
             moveit::planning_interface::MoveGroupInterface::Plan my_plan;
@@ -581,14 +583,22 @@ bool BasePoseCalcuator(reachability::InvReach::Request& req, reachability::InvRe
             {
                 ROS_WARN("Movegroup failed");
             }
-        
-            //move_group.execute(my_plan);
+
+            //Planning 2
+            std::vector<double> target_joints(joint_model_group->getVariableCount());
+            bool found_ik = kinematic_state->setFromIK(joint_model_group, arrow_eef, attempts, timeout);
+            kinematic_state->copyJointGroupPositions(joint_model_group, target_joints);
+            move_group.setJointValueTarget(target_joints);
+            moveit::planning_interface::MoveGroupInterface::Plan my_plan2;
+            move_group.execute(my_plan2);
+
             ROS_INFO("End effector planning end");
 
             for(int i=0; i<JntNum; i++)
             {
-                ROS_INFO_STREAM("jnt:" << SolJnt[0][i]);
+                ROS_INFO_STREAM("JntAns:" << SolJnt[0][i]);
             }
+
 
             eef_check = true;
         }
@@ -612,7 +622,7 @@ int main(int argc, char **argv)
     ROS_INFO_STREAM("IRM data open");
     ros::Time openstart = ros::Time::now();
     std::ifstream loadFile(ros::package::getPath("reachability") + "/src/" + 
-    "right_arm_inverse_reachability6_.csv");
+    "prototype_arm_right_inv.csv");
 
     if (loadFile.fail())
     {

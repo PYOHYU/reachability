@@ -27,7 +27,8 @@ int main(int argc, char** argv)
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
-    static const std::string PLANNING_GROUP = "right_arm";
+    //static const std::string PLANNING_GROUP = "right_arm";
+    static const std::string PLANNING_GROUP = "indy7";
 
     moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
@@ -46,8 +47,10 @@ int main(int argc, char** argv)
     joints_init = move_group.getCurrentJointValues();
 
 // Visualization
-    std::string base_frame = "torso_lift_link";
-    std::string eef_frame = "r_wrist_roll_link";
+    //std::string base_frame = "torso_lift_link";
+    //std::string eef_frame = "r_wrist_roll_link";
+    std::string base_frame = "base_link";
+    std::string eef_frame = "link6";
 
     moveit_visual_tools::MoveItVisualTools visual_tools(base_frame);
     visual_tools.loadRemoteControl();
@@ -56,7 +59,7 @@ int main(int argc, char** argv)
     {
         ROS_INFO_STREAM("Make Worspace Voxels");
         workspace_spreader::WorkspaceSpreader ws;
-        double diameter = 1.5;
+        double diameter = 1.8;
         double resolution = 0.05;
 
 //center of voxels
@@ -117,7 +120,7 @@ int main(int argc, char** argv)
         std::vector< std::pair< geometry_msgs::Pose, double > > solution;
         std::vector< std::vector<double> > joint_solution;
         const unsigned int attempts = 0;
-        const double timeout = 0.0;
+        const double timeout = 0.1;
 
         for (int i = 0; i < pose_col.size(); i++)
         {   
@@ -236,7 +239,7 @@ int main(int argc, char** argv)
 */
         ROS_INFO_STREAM("Make reachability datafile");
 
-        std::ofstream writeFile(ros::package::getPath("reachability") + "/src/" + "right_arm_reachability6.csv");
+        std::ofstream writeFile(ros::package::getPath("reachability") + "/src/" + "moby_reachability.csv");
 
         writeFile << base_frame << "," << eef_frame << "," << JntNum << std::endl;
 
